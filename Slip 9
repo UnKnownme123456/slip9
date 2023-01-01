@@ -1,0 +1,83 @@
+//PHP
+Q1)
+//HTML FILE
+
+<html>
+<body>
+<form action="slip_9.php"method="get">
+Enter a string:<input type="text" name="str1"><br>
+choose a label
+<select name="sep" id="sep">
+<option value="#">#</option>
+<option value="!">!</option>
+<option value="@">@</option>
+</select><br>
+<input type="radio" name="op" value="a">Split The String Using The Seperator<br>
+<input type="radio" name="op" value="b">Replace The Occurences Of The
+Seperator With Another Seperator<br>
+<input type="radio" name="op" value="c">Find The Last Word Of The String<br>
+<input type="submit"value="submit">
+</form>
+</body>
+</html>
+
+//PHP FILE
+<?php
+$str=$_GET['str1'];
+$sep=$_GET['sep'];
+$op=$_GET['op'];
+"$str $sep $op";
+switch($op)
+{
+ case 'a':$m=explode($sep,$str);
+ foreach($m as $a){
+ echo "$a<br>";
+ }
+ break;
+ case 'b':
+ $cnt=substr_count($str,$sep);
+ $n=str_replace($sep,"!",$str,$cnt);
+ echo "After changing separators<br>";
+ echo $n;
+ break;
+ case 'c':$ar=explode(" ",$str);
+ $cnt=count($ar);
+ echo "This is the last word : ".$ar[$cnt-1];
+ break;
+}
+?>
+
+
+
+
+//DS
+Q2A)
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib import colors
+from matplotlib.ticker import PercentFormatter
+no_of_balls=50
+x = np.random.randn(50)
+y = np.random.randn(50)
+colors = [np.random.randint(1, 4) for i in range(no_of_balls)]
+plt.plot(x,y)
+plt.show()
+plt.scatter(x,y,c=colors)
+plt.show()
+
+Q2B)
+ from matplotlib import pyplot as plt
+import numpy as np
+# Creating dataset
+subjects = ['TCS', 'Data Science', 'OS',
+        'JAVA', 'PHP', 'Python']
+marks = [23, 17, 35, 29, 12, 33]
+ 
+# Creating plot
+fig = plt.figure(figsize =(10, 7))
+plt.pie(marks, labels = subjects)
+ 
+# show plot
+plt.show()
+
+
