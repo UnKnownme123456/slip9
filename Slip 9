@@ -1,83 +1,319 @@
-//PHP
-Q1)
-//HTML FILE
+Q1
 
-<html>
-<body>
-<form action="slip_9.php"method="get">
-Enter a string:<input type="text" name="str1"><br>
-choose a label
-<select name="sep" id="sep">
-<option value="#">#</option>
-<option value="!">!</option>
-<option value="@">@</option>
-</select><br>
-<input type="radio" name="op" value="a">Split The String Using The Seperator<br>
-<input type="radio" name="op" value="b">Replace The Occurences Of The
-Seperator With Another Seperator<br>
-<input type="radio" name="op" value="c">Find The Last Word Of The String<br>
-<input type="submit"value="submit">
-</form>
-</body>
-</html>
 
-//PHP FILE
-<?php
-$str=$_GET['str1'];
-$sep=$_GET['sep'];
-$op=$_GET['op'];
-"$str $sep $op";
-switch($op)
+#include<stdio.h>
+
+#define size 100
+int n;
+int m;
+int avail[size];
+int max[size][size];
+int alloc[size][size];
+int need[size][size];
+int finish[size];
+int work[size];
+int safe[size];
+int sp;
+int req[size];
+int pReq;
+
+int calAfterReq();
+void calNeed();
+int calSafe();
+void getAlloc();
+void getAvail();
+void getMax();
+void getReq();
+void putAlloc();
+void putAvail();
+void putMax();
+void putNeed();
+void putSafe();
+void putWork();
+
+int main()
 {
- case 'a':$m=explode($sep,$str);
- foreach($m as $a){
- echo "$a<br>";
- }
- break;
- case 'b':
- $cnt=substr_count($str,$sep);
- $n=str_replace($sep,"!",$str,$cnt);
- echo "After changing separators<br>";
- echo $n;
- break;
- case 'c':$ar=explode(" ",$str);
- $cnt=count($ar);
- echo "This is the last word : ".$ar[$cnt-1];
- break;
+char choice;
+printf("Enter the number of processes:\t");
+scanf("%d",&n);
+printf("Enter the number of resources:\t");
+scanf("%d",&m);
+getAvail();
+getAlloc();
+getMax();
+calNeed();
+putAlloc();
+putAvail();
+putMax();
+putNeed();
+
+
+
+if(!calSafe())
+
+{
+printf("ERROR: System is not in safe sequence.\n");
+return;
 }
-?>
+putSafe();
+printf("Do you want to add a request?(y for yes)\t");
+scanf("%c",&choice);
+if(choice=='y' && choice=='Y')
+return 0;
+getReq();
+switch(calAfterReq())
+{
+case -1:
+puts("ERROR : Contradiction to condition request<=need.\n");
+return 1;
+case -2 :
+puts("ERROR: Contradiction to condition request<=avail.\n");
+return 1;
+}
+puts("\n\nData after processing of request:");
+
+putAvail();
+
+if(!calSafe())
+{
+printf("ERROR :System is not in safe sequence\n");
+return 1;
+}
+putSafe();
+}
+int calAfterReq()
+{
+int i,j;
+for(j=0;j<m;j++)
+{
+if(!(req[j]<=need[pReq][j]))
+return -1;
+if(!(req[j]<=avail[j]))
+return -2;
+alloc[pReq][j] +=req[j];
+avail[j]-= req[j];
+}
+}
+
+void calNeed()
+{
+int i,j;
+for(i=0;i<n;i++)
+for(j=0;j<m;j++) 
+need[i][j]=max[i][j]-alloc[i][j];
+}
+int calSafe()
+{
+int countUnfinished()
+{
+int i,unfinished;
+for(unfinished=0,i=0;i<n;i++)
+if(finish[i]==0)
+unfinished++;
+return unfinished;
+}
+
+int i,j;
+int oldUnfinished;
+int newUnfinished;
+for(j=0;j<m;j++)
+work[j]= avail[j];
+newUnfinished=n;
+
+while(1)
+{
+oldUnfinished=newUnfinished;
+for(i=0;i<n;i++)
+{
+if(finish[i])
+continue;
+for(j=0;j<m;j++)
+if(!(need[i][j]<=work[j]))
+break ;
+
+if(j==m)
+{
+safe[sp++]=i;
+for(j=0;j<m;j++)
+work[j]+=alloc[i][j];
+finish[i]=1;
+}
+}
+newUnfinished=countUnfinished();
+
+if(newUnfinished==0)
+return 1;
+else if(newUnfinished==oldUnfinished)
+return 0;
+}
+}
+void getAlloc()
+{
+int i,j;
+printf("\nEnter allocations([proc][res])\n");
+for(i=0;i<n;i++)
+for(j=0;j<m;j++)
+{
+printf("allocation[%d][%d]:\t",i,j);
+scanf("%d",&alloc[i][j]);
+}
+}
+void getAvail()
+{
+int j;
+printf("\nEnter available([res])\n");
+for(j=0;j<m;j++)
+{
+printf("available[%d]:\t",j);
+scanf("%d",&avail[j]);
+}
+}
+void getMax()
+{
+int i,j;
+printf("\nEnter maxes ([proc][res])\n");
+for(i=0;i<n;i++)
+for(j=0;j<m;j++)
+{
+printf("max[%d][%d]:\t",i,j);
+scanf("%d",&max[i][j]);
+}
+}
+
+void getReq()
+{
+int j;
+printf("\nEnter the index of process to add request for,(index starts from 0)\t");
+scanf("%d",&pReq);
+printf("Enter the request:([res])\n");
+for(j=0;j<m;j++)
+{
+printf("request[%d]:\t",j);
+scanf("%d",&req[j]);
+}
+}
+void putAlloc()
+{
+int i,j;
+printf("\nAllocations are:\n");
+for(i=0;i<n;i++)
+{
+printf("p%d\t",i);
+for(j=0;j<m;j++)
+printf("%d\t",alloc[i][j]);
+printf("\n");
+}
+}
+void putAvail()
+{
+int j;
+printf("\nAvailables are:\n");
+for(j=0;j<m;j++)
+{
+printf("%d\t",avail[j]);
+printf("\n");
+}
+}
+void putMax()
+{
+int i,j;
+printf("\nMaxes are:\n");
+for(i=0;i<n;i++)
+{
+printf("p%d\t",i);
+for(j=0;j<m;j++)
+printf("%d\t",max[i][j]);
+printf("\n");
+}
+}
+void putNeed()
+{
+int i,j;
+printf("\nNeed are:\n");
+for(i=0;i<n;i++)
+{
+printf("p%d\t",i);
+for(j=0;j<m;j++)
+printf("%d\t",need[i][j]);
+printf("\n");
+}
+}
+void putSafe()
+{
+int i;
+printf("\nThe safe sequence is:\n");
+for(i=0;i<sp;i++)
+printf("%d\t",safe[i]);
+printf("\n");
+}
+
+void putWork()
+{
+int j;
+printf("Work:\n");
+for(j=0;j<m;j++)
+{
+printf("%d\t",work[j]);
+}
+printf("\n");
+}
 
 
-
-
-//DS
-Q2A)
-import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib import colors
-from matplotlib.ticker import PercentFormatter
-no_of_balls=50
-x = np.random.randn(50)
-y = np.random.randn(50)
-colors = [np.random.randint(1, 4) for i in range(no_of_balls)]
-plt.plot(x,y)
-plt.show()
-plt.scatter(x,y,c=colors)
-plt.show()
-
-Q2B)
- from matplotlib import pyplot as plt
-import numpy as np
-# Creating dataset
-subjects = ['TCS', 'Data Science', 'OS',
-        'JAVA', 'PHP', 'Python']
-marks = [23, 17, 35, 29, 12, 33]
- 
-# Creating plot
-fig = plt.figure(figsize =(10, 7))
-plt.pie(marks, labels = subjects)
- 
-# show plot
-plt.show()
-
+Q2
+#include<stdio.h>
+#include<stdlib.h>
+int main()
+{
+  int RQ[100],i,j,n,TotalHeadMoment=0,initial,size,move;
+  printf("Enter the no. of request:\n");
+  scanf("%d",&n);
+  printf("Enter the requests sequence\n");
+for(i=0;i<n;i++)
+ scanf("%d",&RQ[i]);
+printf("Enter the initial head position:\n");
+scanf("%d",&initial);
+printf("Enter total disk size\n");
+  scanf("%d",&size);
+printf("Enter the head movement direction for high 1 and for low 0\n");
+  scanf("%d",&move);
+for(i=0;i<n;i++)
+{
+for(j=0;j<n-i-1;j++)
+{
+if(RQ[j]>RQ[j+1])
+{
+int temp;
+temp=RQ[j];
+RQ[j]=RQ[j+1];
+RQ[j+1]=temp;
+}
+}
+}
+int index;
+for(i=0;i<n;i++)
+{
+if(initial<RQ[i])
+{
+index=i;
+break;
+}
+}
+if(move==1)
+{
+for(i=index-1;i>=0;i--)
+{
+TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+initial=RQ[i];
+}
+TotalHeadMoment=TotalHeadMoment+abs(RQ[i+1]-0);
+initial=0;
+for(i=index;i<n;i++)
+{
+TotalHeadMoment=TotalHeadMoment+abs(RQ[i]-initial);
+initial=RQ[i];
+}
+}
+printf("Total head movement is %d",TotalHeadMoment);
+return 0;
+}
 
